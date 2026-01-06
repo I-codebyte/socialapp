@@ -3,6 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const userRouters = require("./routes/userRouters");
 const connectDB = require("./config/configDB");
+const cookieParser = require("cookie-parser");
 
 
 connectDB()
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 app.use("/", userRouters);
 
 app.use((err, req, res, next) => {

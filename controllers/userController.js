@@ -92,4 +92,65 @@ const logout = async (req, res, next) => {
 	}
 };
 
-module.exports = { register, login, logout };
+const editUser = async (req, res, next) => {
+	const { newUsername, newEmail, newPassword } = req.body;
+	const { userID } = req.user;
+
+	try {
+		const user = await User.findById(userID);
+
+		if (newUsername) {
+			const existingUsername = await User.findOne({
+				username: newUsername,
+			});
+
+			if (existingUsername) {
+				throw new AuthenticationError(
+					`a user exit with ${newUsername} already exist`
+				);
+			}
+
+			user.username = newUsername;
+		}
+
+		if (newEmail) {
+			const existingEmail = await User.findOne({
+				email: newEmail,
+			});
+
+			if (existingEmail) {
+				throw new AuthenticationError(
+					`a user with ${newEmail} already exist`
+				);
+			}
+
+			user.email = newEmail;
+		}
+
+		if (password) {
+			const hashPass = await bcrypt.hash(password, salt);
+
+			user.password = hashPass;
+		}
+
+		await user.save();
+		res.status(200).json({
+			message: "success",
+			updated: {
+				username: newUsername
+					? "your username has been updated"
+					: null,
+				email: newEmail
+					? "your email has been updated"
+					: null,
+				password: newPassword
+					? "your password has been updated"
+					: null,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+module.exports = { register, login, logout, editUser };
