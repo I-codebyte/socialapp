@@ -153,4 +153,51 @@ const editUser = async (req, res, next) => {
 	}
 };
 
-module.exports = { register, login, logout, editUser };
+const deleteAccount = async (req, res, next) => {
+	const { userID } = req.user;
+
+	try {
+		await User.deleteOne({ _id: userID });
+	} catch (err) {
+		next(err);
+	}
+};
+
+const getAllUser = async (req, res) => {
+	const users = await User.find().select("-password");
+
+	res.status(200).send(users);
+};
+
+const getUserById = async (req, res, next) => {
+	const _id = req.params;
+
+	try {
+		const user = await User.findOne({ _id }).select("-password");
+
+		res.status(200).send(user);
+	} catch (err) {
+		next(err);
+	}
+};
+
+const deleteUserById = async (req, res, next) => {
+	const _id = req.params;
+
+	try {
+		const user = await User.findByIdAndDelete(_id)
+	} catch (err) {
+		next(err);
+	}
+};
+
+module.exports = {
+	register,
+	login,
+	logout,
+	editUser,
+	deleteAccount,
+	getAllUser,
+	getUserById,
+	deleteUserById
+};
